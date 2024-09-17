@@ -1,0 +1,6 @@
+Flask
+python-dotenv
+uvicorn
+ibm-watsonx-ai
+asgiref
+flask-cors

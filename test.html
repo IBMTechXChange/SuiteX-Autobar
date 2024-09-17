@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Granite API</title>
+    <script>
+        async function sendQuestion() {
+            const question = document.getElementById('question').value;
+
+            // Prepare the payload
+            const payload = {
+                question: question
+            };
+
+            try {
+                // Send the POST request to the Flask API
+                const response = await fetch('http://localhost:8000/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                // Parse the JSON response
+                const data = await response.json();
+
+                // Display the response
+                document.getElementById('response').innerText = JSON.stringify(data, null, 2);
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('response').innerText = 'Error communicating with the API';
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Granite API Tester</h1>
+
+    <div>
+        <label for="question">Enter your question:</label>
+        <input type="text" id="question" name="question">
+        <button onclick="sendQuestion()">Submit</button>
+    </div>
+
+    <h2>API Response:</h2>
+    <pre id="response" style="background-color: #f4f4f4; padding: 10px; border: 1px solid #ccc;"></pre>
+
+</body>
+</html>
