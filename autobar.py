@@ -60,6 +60,10 @@ Example JSON response:
   }
 }
 """
+@app.route('/', methods=['GET'])
+def check():
+    return jsonify({"message": "Obviously this works Salik made it ;)"})
+
 
 @app.route('/generate', methods=['POST'])
 def generate_response():
