@@ -62,7 +62,7 @@ Example JSON response:
 """
 @app.route('/', methods=['GET'])
 def check():
-    return jsonify({"message": "Obviously this works Salik made it ;)"})
+    return {"message": "this works"}
 
 
 @app.route('/generate', methods=['POST'])
