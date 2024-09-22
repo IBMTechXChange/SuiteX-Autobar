@@ -4,6 +4,8 @@ from flask_cors import CORS
 from ibm_watsonx_ai.foundation_models import Model
 from dotenv import load_dotenv
 from asgiref.wsgi import WsgiToAsgi
+import json
+import re
 
 load_dotenv()
 
@@ -16,11 +18,21 @@ def get_credentials():
         "apikey": os.getenv('API_KEY')
     }
 
+def jsonfind(generated_response):
+    first = generated_response.find('{')
+    last = generated_response.rfind('}')
+    
+    if first != -1 and last != -1 and first < last:
+        return generated_response[first:last+1] 
+    else:
+        return -1
+
 model_id = "ibm/granite-13b-chat-v2"
 
 parameters = {
     "decoding_method": "greedy",
     "max_new_tokens": 900,
+    "temperature": 0.0,
     "repetition_penalty": 1.05
 }
 
@@ -59,6 +71,8 @@ Example JSON response:
     "body": "I hope this message finds you well. I’m writing to remind you that the deadline for signing the Non-Disclosure Agreement (NDA) is approaching on 00-00."
   }
 }
+
+If the output cannot be represented in just a json format then return 0 as the output
 """
 @app.route('/', methods=['GET'])
 def check():
@@ -69,13 +83,21 @@ def check():
 def generate_response():
     data = request.json
     question = data.get("question", "")
+    print(question)
 
     formatted_question = f"""<|user|>\n{question}\n<|assistant|>\n"""
     prompt = f"""{prompt_input}{formatted_question}"""
 
     generated_response = model.generate_text(prompt=prompt, guardrails=False)
+    print(generate_response)
 
-    return jsonify({"response": generated_response})
+    clean = generated_response.replace('\n', '')
+
+    clean = jsonfind(clean)
+    print(clean)
+
+    return jsonify({"response": clean})
+
 
 asgi_app = WsgiToAsgi(app)
 

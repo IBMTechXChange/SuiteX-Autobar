@@ -3,49 +3,145 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test Granite API</title>
-    <script>
-        async function sendQuestion() {
-            const question = document.getElementById('question').value;
+    <title>Granite AI Task Automation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
 
-            // Prepare the payload
-            const payload = {
-                question: question
-            };
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 24px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-size: 16px;
+            color: #555;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+            resize: none;
+            height: 100px;
+        }
+
+        button {
+            width: 100%;
+            background-color: #007BFF;
+            color: white;
+            padding: 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .response-container {
+            margin-top: 20px;
+            background-color: #f1f1f1;
+            padding: 10px;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .response-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .response-content {
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+
+        .error {
+            color: red;
+            text-align: center;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Granite AI Automation</h1>
+        <form id="aiForm">
+            <label for="question">Enter your task:</label>
+            <textarea id="question" name="question" required></textarea>
+            <button type="submit">Submit</button>
+        </form>
+        <div class="response-container" id="responseContainer">
+            <div class="response-title">API Response:</div>
+            <div class="response-content" id="responseContent"></div>
+        </div>
+        <div class="error" id="error"></div>
+    </div>
+
+    <script>
+        document.getElementById('aiForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const question = document.getElementById('question').value;
+            const responseContainer = document.getElementById('responseContainer');
+            const responseContent = document.getElementById('responseContent');
+            const errorContainer = document.getElementById('error');
+
+            // Reset display
+            responseContainer.style.display = 'none';
+            errorContainer.textContent = '';
 
             try {
-                // Send the POST request to the Flask API
                 const response = await fetch('http://localhost:8000/generate', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify({ question }),
                 });
 
-                // Parse the JSON response
+                if (!response.ok) {
+                    throw new Error('Failed to connect to the API.');
+                }
+
                 const data = await response.json();
 
-                // Display the response
-                document.getElementById('response').innerText = JSON.stringify(data, null, 2);
+                // Display response
+                responseContent.textContent = data.response;
+                responseContainer.style.display = 'block';
             } catch (error) {
-                console.error('Error:', error);
-                document.getElementById('response').innerText = 'Error communicating with the API';
+                errorContainer.textContent = 'Error: ' + error.message;
             }
-        }
+        });
     </script>
-</head>
-<body>
-    <h1>Granite API Tester</h1>
-
-    <div>
-        <label for="question">Enter your question:</label>
-        <input type="text" id="question" name="question">
-        <button onclick="sendQuestion()">Submit</button>
-    </div>
-
-    <h2>API Response:</h2>
-    <pre id="response" style="background-color: #f4f4f4; padding: 10px; border: 1px solid #ccc;"></pre>
 
 </body>
 </html>
